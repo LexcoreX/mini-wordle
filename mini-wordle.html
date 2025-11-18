@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Mini Worldle</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #111;
+        color: white;
+        padding: 20px;
+        text-align: center;
+    }
+    #currentWord {
+        font-size: 50px;
+        margin: 30px 0;
+        padding: 20px;
+        background: #222;
+        border-radius: 10px;
+    }
+    input {
+        padding: 10px;
+        width: 250px;
+        font-size: 16px;
+    }
+    button {
+        padding: 10px 20px;
+        font-size: 16px;
+        margin-left: 5px;
+        cursor: pointer;
+    }
+    #wordList {
+        margin-top: 20px;
+    }
+    .item {
+        padding: 8px;
+        background: #222;
+        margin: 5px auto;
+        width: 250px;
+        border-radius: 5px;
+    }
+    .removeBtn {
+        float: right;
+        cursor: pointer;
+        color: #ff5757;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+
+<h1>Mini Worldle 🌍</h1>
+<p>Shows a random word every 5 minutes.</p>
+
+<div id="currentWord">Loading...</div>
+
+<input id="newWord" placeholder="Add a word...">
+<button onclick="addWord()">Add</button>
+
+<div id="wordList"></div>
+
+<script>
+let words = JSON.parse(localStorage.getItem("miniWorldleWords")) || [];
+let timer = null;
+
+// Save words
+function save() {
+    localStorage.setItem("miniWorldleWords", JSON.stringify(words));
+}
+
+// Add word
+function addWord() {
+    let w = document.getElementById("newWord").value.trim();
+    if (w === "") return;
+    words.push(w);
+    document.getElementById("newWord").value = "";
+    save();
+    renderWords();
+}
+
+// Remove word
+function removeWord(index) {
+    words.splice(index, 1);
+    save();
+    renderWords();
+}
+
+// Show list
+function renderWords() {
+    let html = "";
+    words.forEach((w, i) => {
+        html += `<div class='item'>${w} <span class="removeBtn" onclick="removeWord(${i})">X</span></div>`;
+    });
+    document.getElementById("wordList").innerHTML = html;
+}
+
+// Pick a random word
+function showRandomWord() {
+    if (words.length === 0) {
+        document.getElementById("currentWord").innerText = "No words yet!";
+        return;
+    }
+    let random = Math.floor(Math.random() * words.length);
+    document.getElementById("currentWord").innerText = words[random];
+}
+
+// Auto update every 5 mins
+function startTimer() {
+    showRandomWord();
+    timer = setInterval(showRandomWord, 300000); // 5 minutes
+}
+
+renderWords();
+startTimer();
+</script>
+
+</body>
+</html>
